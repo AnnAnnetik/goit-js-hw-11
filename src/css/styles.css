@@ -68,3 +68,22 @@ button {
   width: 91px;
   height: 40px;
 }
+.gallery {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 24px;
+  flex-wrap: wrap;    
+  }
+  
+  
+  .gallery-image {
+    width: 360px;
+    height: 200px;
+    flex-shrink: 0;
+   
+  }
+
+  .gallery-item {
+    width: calc((100% - 48px) / 3);
+  }
