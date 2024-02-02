@@ -4,12 +4,10 @@ import 'izitoast/dist/css/iziToast.min.css';
 import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
 
-import css from 'file.css';
+const formEl = document.querySelector('.form');
+const galleryEl = document.querySelector('.gallery');
+const loader = document.querySelector('.loader');
 
-const refs = {
-  formEl: document.querySelector('.form'),
-  galleryEl: document.querySelector('.gallery'),
-};
 const searchParams = new URLSearchParams({
   key: '42110229-d56f9063956695e15527c98fc',
   q: '',
@@ -18,12 +16,16 @@ const searchParams = new URLSearchParams({
   safesearch: 'true',
 });
 
-refs.formEl.addEventListener('submit', onSubmitForm);
+formEl.addEventListener('submit', onSubmitForm);
 
 function onSubmitForm(e) {
   e.preventDefault();
-  const textSearch = e.target.elements.search.value;
-  searchParams.q = textSearch;
+
+  galleryEl.innerHTML = '';
+
+  const inputElText = e.target.elements.search.value.trim();
+  searchParams.q = inputElText;
+
   fetchImg()
     .then(images => renderImg(images))
     .catch(error => console.log(error));
@@ -31,7 +33,7 @@ function onSubmitForm(e) {
 }
 
 function fetchImg() {
-  return fetch('https://pixabay.com/api/?${searchParams}').then(response => {
+  return fetch(`https://pixabay.com/api/?${searchParams}`).then(response => {
     if (!response.ok) {
       throw new Error(response.status);
     }
@@ -40,7 +42,7 @@ function fetchImg() {
 }
 
 function renderImg(images) {
-  if (images.length === 0) {
+  if (images.hits.length === 0) {
     iziToast.show({
       message:
         'Sorry, there are no images matching your search query. Please try again!',
@@ -52,7 +54,7 @@ function renderImg(images) {
       position: 'topRight',
     });
   } else {
-    const galleryMarkup = images
+    const galleryMarkup = images.hits
       .map(
         image =>
           `<li class="gallery-item">
@@ -63,12 +65,19 @@ function renderImg(images) {
               alt="${image.tags}"
         />
       </a>
+      <div class="img-info">
+      <p>Likes: ${image.likes}</p>
+      <p>Views: ${image.views}</p>
+      <p>Comments: ${image.comments}</p>
+      <p>Downloads: ${image.downloads}</p>
+      </div>
       </li>`
       )
       .join('');
 
-    refs.galleryEl.insertAdjacentHTML('beforeend', galleryMarkup);
+    galleryEl.insertAdjacentHTML('beforeend', galleryMarkup);
 
-    let lightbox = new SimpleLightbox('.gallery a').refresh();
+    let lightbox = new SimpleLightbox('.gallery-item').refresh();
   }
+  loader.style.display = 'none';
 }
