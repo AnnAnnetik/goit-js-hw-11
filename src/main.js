@@ -7,38 +7,48 @@ import 'simplelightbox/dist/simple-lightbox.min.css';
 const formEl = document.querySelector('.form');
 const galleryEl = document.querySelector('.gallery');
 const loader = document.querySelector('.loader');
+// loader.style.display='none';
 
-const searchParams = new URLSearchParams({
-  key: '42110229-d56f9063956695e15527c98fc',
-  q: '',
-  image_type: 'photo',
-  orientation: 'horizontal',
-  safesearch: 'true',
-});
+
 
 formEl.addEventListener('submit', onSubmitForm);
 
 function onSubmitForm(e) {
   e.preventDefault();
-
-  galleryEl.innerHTML = '';
+  
+  
 
   const inputElText = e.target.elements.search.value.trim();
-  searchParams.q = inputElText;
+  if(inputElText===''){
+    return;
+  }
+  galleryEl.innerHTML = '';
+  loader.style.display='inline-block';
+
 
   fetchImg()
+
     .then(images => renderImg(images))
     .catch(error => console.log(error));
   e.target.reset();
 }
 
 function fetchImg() {
+ 
+let inputElText= document.querySelector('input').value;
+  const searchParams = new URLSearchParams({
+    key: '42110229-d56f9063956695e15527c98fc',
+    q: `${inputElText}`,
+    image_type: 'photo',
+    orientation: 'horizontal',
+    safesearch: 'true',
+  });
   return fetch(`https://pixabay.com/api/?${searchParams}`).then(response => {
     if (!response.ok) {
       throw new Error(response.status);
     }
     return response.json();
-  });
+  }); 
 }
 
 function renderImg(images) {
@@ -77,7 +87,12 @@ function renderImg(images) {
 
     galleryEl.insertAdjacentHTML('beforeend', galleryMarkup);
 
-    let lightbox = new SimpleLightbox('.gallery-item').refresh();
+    let lightbox = new SimpleLightbox('.gallery a', {
+      captions: true, 
+        captionDelay: 250, 
+        captionsData: 'alt',  });
+        lightbox.refresh();
   }
-  loader.style.display = 'none';
+  loader.style.display='none';
+ 
 }
