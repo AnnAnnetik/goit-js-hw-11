@@ -7,7 +7,7 @@ import 'simplelightbox/dist/simple-lightbox.min.css';
 const formEl = document.querySelector('.form');
 const galleryEl = document.querySelector('.gallery');
 const loader = document.querySelector('.loader');
-// loader.style.display='none';
+loader.style.display='none';
 
 
 
@@ -18,7 +18,7 @@ function onSubmitForm(e) {
   
   
 
-  const inputElText = e.target.elements.search.value.trim();
+  const inputElText = getInputText();
   if(inputElText===''){
     return;
   }
@@ -26,19 +26,21 @@ function onSubmitForm(e) {
   loader.style.display='inline-block';
 
 
-  fetchImg()
+  fetchImg(inputElText)
 
     .then(images => renderImg(images))
-    .catch(error => console.log(error));
+    .catch(error => {console.log(error); loader.style.display='none'});
   e.target.reset();
 }
 
-function fetchImg() {
- 
-let inputElText= document.querySelector('input').value;
-  const searchParams = new URLSearchParams({
+function getInputText(){
+  return document.querySelector('input').value.trim();
+}
+
+function fetchImg(inputElText) {
+   const searchParams = new URLSearchParams({
     key: '42110229-d56f9063956695e15527c98fc',
-    q: `${inputElText}`,
+    q: inputElText,
     image_type: 'photo',
     orientation: 'horizontal',
     safesearch: 'true',
